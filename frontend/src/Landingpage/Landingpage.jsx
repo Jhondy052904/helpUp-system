@@ -66,7 +66,15 @@ function Landingpage() {
       </section>
 
       {/* ABOUT SECTION */}
-      <section id="about" className="about">
+      <section id="about" className="about" style={{
+        backgroundImage: "url(/images/contactus_bg.jpg)",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        width: "100%",
+        height: "70vh",
+        position: "relative",
+      }}>
         <div className="about-content">
           <div className="about-text">
             <strong><h3>About Us</h3></strong>

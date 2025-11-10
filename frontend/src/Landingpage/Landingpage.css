@@ -326,10 +326,6 @@ h4 {
   font-weight: 500;
 }
 
-.contact {
-  background-color: #935b47;
-}
-
 .contact h3 {
   margin-bottom: 40px;
   color: #f7f5f5;
@@ -419,6 +415,8 @@ h4 {
   resize: vertical;
   min-height: 120px;
 }
+
+
 
 .contact-submit-btn {
   background-color: #a50805;
