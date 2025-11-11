@@ -1,14 +1,41 @@
-import React from "react";
+import React, { useState } from "react";
 import "./Landingpage.css";
 import DonationCard from "../components/DonationCard";
+import Register from "../Register/Register"; // make sure this path matches your project structure
+import Login from "../Login/Login";
+import "../Register/Register.css"; // modal + form styling
+import "../Login/Login.css";
 
 function Landingpage() {
+  const [showRegister, setShowRegister] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
+
+  const handleOpenRegister = () => setShowRegister(true);
+  const handleCloseRegister = () => setShowRegister(false);
+
+  const handleOpenLogin = () => setShowLogin(true);
+  const handleCloseLogin = () => setShowLogin(false);
+
+  const handleSwitchToRegister = () => {
+    setShowLogin(false);
+    setShowRegister(true);
+  };
+
+  const handleSwitchToLogin = () => {
+    setShowRegister(false);
+    setShowLogin(true);
+  };
+
   return (
     <div className="landing-container">
       {/* NAVBAR */}
       <nav className="navbar">
         <div className="nav-left">
-          <img src="/HelpUpLogo2.png" alt="HelpUp Logo" style={{height: '60px', width: 'auto'}} />
+          <img
+            src="/HelpUpLogo2.png"
+            alt="HelpUp Logo"
+            style={{ height: "60px", width: "auto" }}
+          />
         </div>
         <div className="nav-center">
           <a href="#drive">Drive</a>
@@ -20,18 +47,30 @@ function Landingpage() {
       {/* HERO SECTION */}
       <section className="hero">
         <div className="hero-text">
-          <div style={{marginTop: '-50px'}}>
-            <img src="/Help.png" alt="HelpUp Name" style={{maxWidth: '60%', height: 'auto'}} />
+          <div style={{ marginTop: "-50px" }}>
+            <img
+              src="/Help.png"
+              alt="HelpUp Name"
+              style={{ maxWidth: "60%", height: "auto" }}
+            />
           </div>
           <p>
-            HelpUp is a donation drive platform dedicated to supporting fire victims. We make it easy for schools, organizations, and communities to organize and manage fundraising drives, ensuring that every contribution helps provide immediate relief, essentials, and support for those affected by fires. Every donation brings hope and rebuilds lives.          </p>
+            HelpUp is a donation drive platform dedicated to supporting fire
+            victims. We make it easy for schools, organizations, and communities
+            to organize and manage fundraising drives, ensuring that every
+            contribution helps provide immediate relief, essentials, and support
+            for those affected by fires. Every donation brings hope and rebuilds
+            lives.
+          </p>
           <div className="nav-right">
-            <br></br>
-          <button className="register-btn">Register</button>
-          <button className="donate-btn">Donate →</button>
+            <br />
+            <button className="register-btn" onClick={handleOpenRegister}>
+              Register
+            </button>
+            <button className="donate-btn">Donate →</button>
+          </div>
         </div>
-        </div>
-        
+
         <div className="hero-cards">
           {[...Array(5)].map((_, index) => (
             <div className="hero-card-wrapper" key={index}>
@@ -40,17 +79,22 @@ function Landingpage() {
                 orgName="Organization Name"
                 donationName="DONATION NAME"
                 desc="Donation description"
-                image={index % 2 === 0 ? "/images/fire_img2.JPG.jpg" : "/images/fireimage.jpg"}
+                image={
+                  index % 2 === 0
+                    ? "/images/fire_img2.JPG.jpg"
+                    : "/images/fireimage.jpg"
+                }
               />
             </div>
           ))}
         </div>
-
       </section>
 
       {/* SUPPORT SECTION */}
       <section className="support">
-        <strong><h2>SEND YOUR DONATIONS</h2></strong>
+        <strong>
+          <h2>SEND YOUR DONATIONS</h2>
+        </strong>
         <div className="support-grid">
           {[...Array(8)].map((_, index) => (
             <DonationCard
@@ -59,30 +103,46 @@ function Landingpage() {
               orgName="Organization Name"
               donationName="DONATION NAME"
               desc="Donation description"
-              image={index % 2 === 0 ? "/images/fire_img2.JPG.jpg" : "/images/fireimage.jpg"}
+              image={
+                index % 2 === 0
+                  ? "/images/fire_img2.JPG.jpg"
+                  : "/images/fireimage.jpg"
+              }
             />
           ))}
         </div>
       </section>
 
       {/* ABOUT SECTION */}
-      <section id="about" className="about" style={{
-        backgroundImage: "url(/images/contactus_bg.jpg)",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
-        width: "100%",
-        height: "70vh",
-        position: "relative",
-      }}>
+      <section
+        id="about"
+        className="about"
+        style={{
+          backgroundImage: "url(/images/contactus_bg.jpg)",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          width: "100%",
+          height: "70vh",
+          position: "relative",
+        }}
+      >
         <div className="about-content">
           <div className="about-text">
-            <strong><h3>About Us</h3></strong>
+            <strong>
+              <h3>About Us</h3>
+            </strong>
             <p>
-              HelpUp is a digital platform built to empower communities, schools, and organizations to create meaningful change. We make it easy to start, manage, and promote donation drives — whether they're for disaster relief, education, food aid, or community development.
+              HelpUp is a digital platform built to empower communities, schools,
+              and organizations to create meaningful change. We make it easy to
+              start, manage, and promote donation drives — whether they're for
+              disaster relief, education, food aid, or community development.
             </p>
             <p>
-              Our mission is simple: to connect people who care with causes that matter. By providing an organized, transparent, and efficient donation management system, HelpUp ensures that every contribution goes where it's needed most — helping communities rise, together.
+              Our mission is simple: to connect people who care with causes that
+              matter. By providing an organized, transparent, and efficient
+              donation management system, HelpUp ensures that every contribution
+              goes where it's needed most — helping communities rise, together.
             </p>
             <div className="about-stats">
               <div className="stat-item">
@@ -102,14 +162,16 @@ function Landingpage() {
         </div>
       </section>
 
-
       {/* CONTACT SECTION */}
       <section id="contact" className="contact">
-        <strong><h3>Contact Us</h3></strong>
+        <strong>
+          <h3>Contact Us</h3>
+        </strong>
         <div className="contact-content">
           <div className="contact-info">
             <p>
-              Have questions, suggestions, or need help setting up your donation drive? We’d love to hear from you!
+              Have questions, suggestions, or need help setting up your donation
+              drive? We’d love to hear from you!
             </p>
             <div className="contact-details">
               <div className="contact-item">
@@ -119,16 +181,24 @@ function Landingpage() {
                 <strong>Phone:</strong> +63 912 345 6789
               </div>
               <div className="contact-item">
-                <strong>Address:</strong> 123 Unity Street, Quezon City, Philippines
+                <strong>Address:</strong> 123 Unity Street, Quezon City,
+                Philippines
               </div>
             </div>
             <p>
-              You can also reach out to us through our social media pages for updates, partnerships, and community stories.
+              You can also reach out to us through our social media pages for
+              updates, partnerships, and community stories.
             </p>
             <div className="social-links">
-              <a href="#" className="social-link">Facebook</a>
-              <a href="#" className="social-link">Twitter</a>
-              <a href="#" className="social-link">Instagram</a>
+              <a href="#" className="social-link">
+                Facebook
+              </a>
+              <a href="#" className="social-link">
+                Twitter
+              </a>
+              <a href="#" className="social-link">
+                Instagram
+              </a>
             </div>
           </div>
           <div className="contact-form">
@@ -140,19 +210,54 @@ function Landingpage() {
                 <input type="email" placeholder="Your Email" required />
               </div>
               <div className="form-group">
-                <textarea placeholder="Your Message" rows="5" required></textarea>
+                <textarea
+                  placeholder="Your Message"
+                  rows="5"
+                  required
+                ></textarea>
               </div>
-              <button type="submit" className="contact-submit-btn">Send Message</button>
+              <button type="submit" className="contact-submit-btn">
+                Send Message
+              </button>
             </form>
           </div>
         </div>
       </section>
 
-
       {/* FOOTER */}
       <footer>
         <p>© 2025 HelpUp. All rights reserved.</p>
       </footer>
+
+      {/* REGISTER MODAL */}
+      {showRegister && (
+        <div className="modal-overlay" onClick={handleCloseRegister}>
+          <div
+            className="modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button className="modal-close" onClick={handleCloseRegister}>
+              &times;
+            </button>
+            <Register onClose={handleCloseRegister} onSwitchToLogin={handleSwitchToLogin} />
+          </div>
+        </div>
+      )}
+
+      {/* LOGIN MODAL */}
+      {showLogin && (
+        <div className="modal-overlay" onClick={handleCloseLogin}>
+          <div
+            className="modal-content"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button className="modal-close" onClick={handleCloseLogin}>
+              &times;
+            </button>
+            <Login onClose={handleCloseLogin} onSwitchToRegister={handleSwitchToRegister} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
