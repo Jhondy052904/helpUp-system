@@ -67,7 +67,7 @@ function Landingpage({ onLogin }) {
             <button className="register-btn" onClick={handleOpenRegister}>
               Register
             </button>
-            <button className="donate-btn">Donate →</button>
+            <button className="donate-btn" onClick={handleOpenLogin}>Donate →</button>
           </div>
         </div>
 
