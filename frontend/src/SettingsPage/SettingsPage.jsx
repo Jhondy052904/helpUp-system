@@ -13,6 +13,7 @@ const SettingsPage = () => {
   const handleNav = (name) => {
     if (name === 'Home') navigate('/homepage');
     if (name === 'Donation') navigate('/global-donations');
+    if (name === 'Top Up') navigate('/top-up');
     if (name === 'Profile') navigate('/profile');
     if (name === 'Settings') navigate('/settings');
     // Add other navigations as needed

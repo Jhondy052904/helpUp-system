@@ -388,7 +388,7 @@ function Landingpage({ onLogin }) {
             <button className="modal-close" onClick={handleCloseRegister}>
               &times;
             </button>
-            <Register onClose={handleCloseRegister} onSwitchToLogin={handleSwitchToLogin} />
+            <Register onClose={handleCloseRegister} onSwitchToLogin={handleSwitchToLogin} onRegisterSuccess={onLogin} />
           </div>
         </div>
       )}

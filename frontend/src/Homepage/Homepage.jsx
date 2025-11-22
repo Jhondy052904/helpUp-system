@@ -1,28 +1,26 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import DonationCard from "../components/DonationCard.jsx";
 import FloatingNav from "../components/navbar.jsx";
 import TopNavbar from "../components/TopNavbar.jsx";
 
 const Homepage = () => {
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
 
   const handleLogout = () => {
+    logout();
     navigate('/');
   };
 
   const handleNav = (name) => {
     if (name === 'Home') navigate('/homepage');
     if (name === 'Donation') navigate('/global-donations');
+    if (name === 'Top Up') navigate('/top-up');
     if (name === 'Profile') navigate('/profile');
     if (name === 'Settings') navigate('/settings');
     // Add other navigations as needed
-  };
-
-  // Mock user data for demonstration
-  const user = {
-    firstName: 'John',
-    lastName: 'Doe'
   };
 
   return (
@@ -35,7 +33,7 @@ const Homepage = () => {
         {/* Welcome Section */}
         <div className="mb-8 bg-gradient-to-r from-[#f8f9fa] to-[#e9ecef] p-8 rounded-xl border-l-4 border-[#a50805] shadow-md">
           <h1 className="text-4xl font-bold text-[#624d41] mb-3 text-left">
-            Welcome back, {user.firstName} {user.lastName}!
+            Welcome back, {user.first_name} {user.last_name}!
           </h1>
           <p className="text-[#b56547] text-xl leading-relaxed text-left">
             Thank you for being part of the HelpUp community. Your support helps rebuild lives and brings hope to those in need.
