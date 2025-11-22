@@ -175,7 +175,7 @@ const Register = ({ onClose, onSwitchToLogin, onRegisterSuccess }) => {
 
                 {/* CONTACT NUMBER */}
                 <div>
-             
+
                   <input
                     type="text"
                     name="contactNumber"
@@ -184,6 +184,20 @@ const Register = ({ onClose, onSwitchToLogin, onRegisterSuccess }) => {
                     className="w-full border px-3 py-2 rounded-md focus:outline-red-600"
                     placeholder="Enter mobile number"
                   />
+                </div>
+
+                {/* ROLE SELECTION */}
+                <div>
+                  <label className="block text-gray-700 font-medium mb-2">Role</label>
+                  <select
+                    name="role"
+                    value={formData.role}
+                    onChange={handleChange}
+                    className="w-full border px-3 py-2 rounded-md focus:outline-red-600"
+                  >
+                    <option value="DONOR">Donor</option>
+                    <option value="ORGANIZATION">Organization</option>
+                  </select>
                 </div>
 
                 {/* CONFIRM PASSWORD */}

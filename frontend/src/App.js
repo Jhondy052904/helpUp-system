@@ -10,6 +10,8 @@ import GlobalDonationPage from './GlobalDonationPage/GlobalDonationPage';
 import Donation from "./DonationPage/Donation";
 import TopUpPage from './TopUpPage/TopUpPage';
 import MainAdminPage from './AdminPage/MainAdminPage';
+import OrganizationPage from './OrganizationPage/OrganizationPage';
+import CampaignPage from './OrganizationPage/CampaignPage';
 
 import './App.css';
 
@@ -20,6 +22,8 @@ function AppContent() {
   const handleLogin = (loggedInUser) => {
     if (loggedInUser && loggedInUser.email === 'admin@gmail.com') {
       navigate('/admin');
+    } else if (loggedInUser && loggedInUser.role === 'ORGANIZATION') {
+      navigate('/organization');
     } else {
       navigate('/homepage');
     }
@@ -30,6 +34,8 @@ function AppContent() {
       <Route path="/" element={<Landingpage onLogin={handleLogin} />} />
       <Route path="/homepage" element={<ProtectedRoute><Homepage /></ProtectedRoute>} />
       <Route path="/admin" element={<ProtectedRoute><MainAdminPage /></ProtectedRoute>} />
+      <Route path="/organization" element={<ProtectedRoute><OrganizationPage /></ProtectedRoute>} />
+      <Route path="/organization/campaign/:id" element={<ProtectedRoute><CampaignPage /></ProtectedRoute>} />
       <Route path="/global-donations" element={<ProtectedRoute><GlobalDonationPage /></ProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
       <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />

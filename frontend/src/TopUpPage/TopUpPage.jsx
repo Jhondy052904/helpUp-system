@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import TopUpModal from './TopUpModal';
-import FloatingNav from "../components/navbar.jsx";
 import TopNavbar from "../components/TopNavbar.jsx";
+import SidebarLayout from "../components/SidebarLayout.jsx";
 
 const TopUpPage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState('Top Up');
 
   // Dummy current balance
   const currentBalance = 250;
@@ -22,6 +23,7 @@ const TopUpPage = () => {
   ];
 
   const handleNav = (name) => {
+    setActiveSection(name);
     if (name === 'Home') navigate('/homepage');
     if (name === 'Donation') navigate('/global-donations');
     if (name === 'Top Up') navigate('/top-up');
@@ -35,10 +37,7 @@ const TopUpPage = () => {
   return (
     <>
       <TopNavbar user={user} />
-      <div className="min-h-screen bg-white pr-50 ml-14">
-
-      {/* Main Content */}
-      <div className="max-w-7xl px-6 py-8">
+      <SidebarLayout activeSection={activeSection} onNavigate={handleNav}>
         <h1 className="text-4xl font-bold text-[#624d41] mb-8 text-left">Top Up</h1>
 
         {/* Current Balance Card */}
@@ -120,16 +119,12 @@ const TopUpPage = () => {
             </table>
           </div>
         </div>
-      </div>
+
+      </SidebarLayout>
 
       {/* Top Up Modal */}
       {isModalOpen && <TopUpModal onClose={closeModal} />}
 
-      {/* Floating Navigation */}
-      <div className="fixed right-20 top-40 h-screen z-10">
-        <FloatingNav onNavigate={handleNav} currentPage="Top Up" />
-      </div>
-    </div>
     </>
   );
 };
