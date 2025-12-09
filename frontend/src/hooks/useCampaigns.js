@@ -52,7 +52,7 @@ export const useCampaigns = ({ autoFetch = true, onError } = {}) => {
  * @returns {Object} Formatted campaign data for DonationCard
  */
 export const transformCampaignForCard = (campaign) => {
-  const orgName = campaign.organization?.name || 'Organization';
+  const orgName = campaign.organizationName || 'Organization';
   const donationName = campaign.name || 'Campaign';
   const description = campaign.description || 'No description available';
   const targetAmount = campaign.targetAmount || 0;

@@ -1,11 +1,19 @@
 import React from 'react';
 
-function DonationCard({ price, orgName, donationName, desc, className = '', image }) {
+function DonationCard({ price, orgName, donationName, desc, className = '', image, onDonate, campaignId }) {
   // Helper function to truncate text with ellipsis
   const truncateText = (text, maxLength) => {
     if (!text) return '';
     if (text.length <= maxLength) return text;
     return text.slice(0, maxLength).trim() + '…';
+  };
+
+  const handleDonateClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (onDonate && campaignId) {
+      onDonate(campaignId, donationName);
+    }
   };
 
   return (
@@ -41,7 +49,11 @@ function DonationCard({ price, orgName, donationName, desc, className = '', imag
         </div>
 
         {/* Donation Button - Fixed at bottom */}
-        <button className="w-full bg-gradient-to-r from-glory-red to-red-700 text-white py-2 px-6 rounded-lg font-semibold transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-glory-red focus:ring-offset-2 mt-auto" aria-label={`Donate to ${donationName}`}>
+        <button
+          onClick={handleDonateClick}
+          className="w-full bg-gradient-to-r from-glory-red to-red-700 text-white py-2 px-6 rounded-lg font-semibold transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-glory-red focus:ring-offset-2 mt-auto"
+          aria-label={`Donate to ${donationName}`}
+        >
           Donate Now
         </button>
       </div>

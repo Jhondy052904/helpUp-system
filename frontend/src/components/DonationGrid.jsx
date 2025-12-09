@@ -6,13 +6,22 @@ const DonationGrid = ({
   title = 'All Current Donation Drives',
   columns = 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3',
   className = '',
-  showTitle = true
+  showTitle = true,
+  onDonate
 }) => {
   // Helper function to truncate text with ellipsis
   const truncateText = (text, maxLength) => {
     if (!text) return '';
     if (text.length <= maxLength) return text;
     return text.slice(0, maxLength).trim() + '…';
+  };
+
+  const handleDonateClick = (e, donation) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (onDonate && donation.id) {
+      onDonate(donation.id, donation.donationName);
+    }
   };
 
   return (
@@ -23,8 +32,8 @@ const DonationGrid = ({
 
       <div className={`grid ${columns} gap-6`}>
         {donations.map(donation => (
-          <Link to={`/donation/${donation.id}`} key={donation.id}>
-            <div className="bg-white rounded-xl overflow-hidden shadow hover:shadow-lg transition cursor-pointer h-full flex flex-col">
+          <div key={donation.id} className="bg-white rounded-xl overflow-hidden shadow hover:shadow-lg transition h-full flex flex-col">
+            <Link to={`/donation/${donation.id}`}>
               {/* Image Section - Fixed Height */}
               <div className="w-full h-32 flex-shrink-0 overflow-hidden">
                 <img
@@ -60,12 +69,15 @@ const DonationGrid = ({
                 </div>
 
                 {/* Donation Button - Fixed at bottom */}
-                <button className="w-full bg-[#a50805] text-white py-2 px-6 rounded-lg font-semibold transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-[#a50805] focus:ring-offset-2 mt-auto">
+                <button
+                  onClick={(e) => handleDonateClick(e, donation)}
+                  className="w-full bg-[#a50805] text-white py-2 px-6 rounded-lg font-semibold transition-all duration-300 shadow-md hover:shadow-lg hover:-translate-y-1 focus:outline-none focus:ring-2 focus:ring-[#a50805] focus:ring-offset-2 mt-auto"
+                >
                   Donate
                 </button>
               </div>
-            </div>
-          </Link>
+            </Link>
+          </div>
         ))}
       </div>
     </div>

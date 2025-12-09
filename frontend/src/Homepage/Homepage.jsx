@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import DonationCard from "../components/DonationCard.jsx";
 import TopNavbar from "../components/TopNavbar.jsx";
 import SidebarLayout from "../components/SidebarLayout.jsx";
+import DonateModal from "../DonationPage/DonateModal.jsx";
 import { useCampaigns, transformCampaignForCard } from '../hooks/useCampaigns';
 import WelcomeBanner from './WelcomeBanner';
 import UserStatsCard from './UserStatsCard';
@@ -13,9 +14,10 @@ const Homepage = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const [activeSection, setActiveSection] = useState('Home');
+  const [donateModal, setDonateModal] = useState({ isOpen: false, campaignId: null, campaignTitle: '' });
   
   // Fetch campaigns for featured drives
-  const { campaigns, loading, error } = useCampaigns();
+  const { campaigns, loading, error, refetch } = useCampaigns();
 
   const handleLogout = () => {
     logout();
@@ -30,6 +32,20 @@ const Homepage = () => {
     if (name === 'Profile') navigate('/profile');
     if (name === 'Settings') navigate('/settings');
     // Add other navigations as needed
+  };
+
+  const handleDonateClick = (campaignId, campaignTitle) => {
+    setDonateModal({
+      isOpen: true,
+      campaignId,
+      campaignTitle
+    });
+  };
+
+  const handleCloseDonateModal = () => {
+    setDonateModal({ isOpen: false, campaignId: null, campaignTitle: '' });
+    // Refresh campaigns to show updated data if donation was successful
+    refetch();
   };
 
   const recentActivities = [
@@ -138,7 +154,14 @@ const Homepage = () => {
             ) : campaigns.length > 0 ? (
               campaigns.slice(0, 3).map((campaign) => {
                 const campaignData = transformCampaignForCard(campaign);
-                return <DonationCard key={campaign.campaignID} {...campaignData} />;
+                return (
+                  <DonationCard
+                    key={campaign.campaignID}
+                    {...campaignData}
+                    campaignId={campaign.campaignID}
+                    onDonate={handleDonateClick}
+                  />
+                );
               })
             ) : (
               // No campaigns fallback
@@ -149,6 +172,8 @@ const Homepage = () => {
                   donationName="No Active Campaigns"
                   desc="Currently no active donation drives available"
                   image="/images/fireimage.jpg"
+                  campaignId={null}
+                  onDonate={null}
                 />
                 <DonationCard
                   price="₱0"
@@ -156,6 +181,8 @@ const Homepage = () => {
                   donationName="No Active Campaigns"
                   desc="Currently no active donation drives available"
                   image="/images/fire_img2.JPG.jpg"
+                  campaignId={null}
+                  onDonate={null}
                 />
                 <DonationCard
                   price="₱0"
@@ -163,12 +190,23 @@ const Homepage = () => {
                   donationName="No Active Campaigns"
                   desc="Currently no active donation drives available"
                   image="/images/bagyo_tino1.jpg"
+                  campaignId={null}
+                  onDonate={null}
                 />
               </>
             )}
           </div>
         </div>
       </SidebarLayout>
+
+      {/* Donate Modal */}
+      {donateModal.isOpen && (
+        <DonateModal
+          onClose={handleCloseDonateModal}
+          campaignTitle={donateModal.campaignTitle}
+          campaignId={donateModal.campaignId}
+        />
+      )}
     </>
   );
 };

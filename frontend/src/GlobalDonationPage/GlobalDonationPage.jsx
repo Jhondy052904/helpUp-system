@@ -5,6 +5,7 @@ import SidebarLayout from "../components/SidebarLayout.jsx";
 import PageHeader from "../components/PageHeader.jsx";
 import StatsGrid from "../components/StatsGrid.jsx";
 import DonationGrid from "../components/DonationGrid.jsx";
+import DonateModal from "../DonationPage/DonateModal.jsx";
 import { getAllCampaigns } from "../services/campaignService.js";
 
 const GlobalDonationPage = () => {
@@ -13,6 +14,7 @@ const GlobalDonationPage = () => {
   const [campaigns, setCampaigns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [donateModal, setDonateModal] = useState({ isOpen: false, campaignId: null, campaignTitle: '' });
 
   useEffect(() => {
     loadCampaigns();
@@ -28,7 +30,7 @@ const GlobalDonationPage = () => {
         id: campaign.campaignID,
         donationName: campaign.name,
         desc: campaign.description,
-        orgName: campaign.organization ? campaign.organization.name : 'Unknown Organization',
+        orgName: campaign.organizationName || 'Unknown Organization',
         price: `₱${campaign.targetAmount?.toLocaleString() || '0'}`,
         goal: campaign.targetAmount || 0,
         startDate: campaign.startDate,
@@ -44,6 +46,20 @@ const GlobalDonationPage = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDonateClick = (campaignId, campaignTitle) => {
+    setDonateModal({
+      isOpen: true,
+      campaignId,
+      campaignTitle
+    });
+  };
+
+  const handleCloseDonateModal = () => {
+    setDonateModal({ isOpen: false, campaignId: null, campaignTitle: '' });
+    // Refresh campaigns to show updated data if donation was successful
+    loadCampaigns();
   };
 
   const handleNav = (name) => {
@@ -142,9 +158,10 @@ const GlobalDonationPage = () => {
         <StatsGrid stats={statsData} />
 
         {/* All Donations Section */}
-        <DonationGrid 
-          donations={campaigns} 
+        <DonationGrid
+          donations={campaigns}
           title={campaigns.length > 0 ? 'All Current Donation Drives' : 'No Active Campaigns'}
+          onDonate={handleDonateClick}
         />
         
         {campaigns.length === 0 && (
@@ -161,6 +178,15 @@ const GlobalDonationPage = () => {
           </div>
         )}
       </SidebarLayout>
+
+      {/* Donate Modal */}
+      {donateModal.isOpen && (
+        <DonateModal
+          onClose={handleCloseDonateModal}
+          campaignTitle={donateModal.campaignTitle}
+          campaignId={donateModal.campaignId}
+        />
+      )}
     </>
   );
 };
