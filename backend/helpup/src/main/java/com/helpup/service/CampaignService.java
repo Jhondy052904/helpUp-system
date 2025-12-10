@@ -78,6 +78,7 @@ public class CampaignService {
                 campaign.getStartDate(),
                 campaign.getEndDate(),
                 campaign.getTargetAmount(),
+                campaign.getTotalRaised(),
                 organizationName,
                 organizationID
         );

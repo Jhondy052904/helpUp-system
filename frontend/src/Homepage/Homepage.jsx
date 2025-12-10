@@ -126,8 +126,12 @@ const Homepage = () => {
 
   const handleCloseDonateModal = () => {
     setDonateModal({ isOpen: false, campaignId: null, campaignTitle: '' });
+  };
+
+  const handleDonationSuccess = () => {
     // Refresh campaigns to show updated data if donation was successful
     refetch();
+    setDonateModal({ isOpen: false, campaignId: null, campaignTitle: '' });
   };
 
   const recentActivities = [
@@ -331,6 +335,7 @@ const Homepage = () => {
           onClose={handleCloseDonateModal}
           campaignTitle={donateModal.campaignTitle}
           campaignId={donateModal.campaignId}
+          onDonationSuccess={handleDonationSuccess}
         />
       )}
     </>

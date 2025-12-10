@@ -36,11 +36,6 @@ const OrganizationPageDonor = () => {
             // Fetch campaigns for this organization
             const campaignsData = await getCampaignsByOrganization(orgId);
 
-            // Calculate total raised
-            const totalRaised = campaignsData.reduce((sum, campaign) => {
-                return sum + (campaign.currentAmount || 0);
-            }, 0);
-
             setOrganization({
                 id: orgData.organizationID,
                 name: orgData.name,
@@ -48,7 +43,7 @@ const OrganizationPageDonor = () => {
                 location: orgData.address || 'Location not specified',
                 contactDetails: orgData.contactDetails,
                 activeCampaigns: campaignsData.length,
-                totalRaised: totalRaised,
+                totalRaised: orgData.totalRaised || 0,
                 memberCount: orgData.memberCount || 0,
             });
 
@@ -84,8 +79,12 @@ const OrganizationPageDonor = () => {
 
     const handleCloseDonateModal = () => {
         setDonateModal({ isOpen: false, campaignId: null, campaignTitle: '' });
+    };
+
+    const handleDonationSuccess = () => {
         // Refresh campaigns to show updated data if donation was successful
         loadOrganizationDetails();
+        setDonateModal({ isOpen: false, campaignId: null, campaignTitle: '' });
     };
 
     const handleNav = (name) => {
@@ -264,6 +263,7 @@ const OrganizationPageDonor = () => {
                         campaignId={donateModal.campaignId}
                         campaignTitle={donateModal.campaignTitle}
                         onClose={handleCloseDonateModal}
+                        onDonationSuccess={handleDonationSuccess}
                     />
                 )}
             </SidebarLayout>

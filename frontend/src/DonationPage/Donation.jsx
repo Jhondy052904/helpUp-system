@@ -70,17 +70,20 @@ const Donation = () => {
       }
     };
     loadCampaign();
+  };
+
+  const handleCloseModal = () => {
     setIsModalOpen(false);
   };
 
   // Calculate progress percentage
-  const progressPercent = campaign ? Math.min(((campaign.totalRaised || 0) / (campaign.goalAmount || 1)) * 100, 100) : 0;
+  const progressPercent = campaign ? Math.min(((campaign.totalRaised || 0) / (campaign.targetAmount || 1)) * 100, 100) : 0;
 
   // Build campaign details from actual data
   const campaignDetails = campaign ? [
     { label: "Organized by", value: organization?.name || 'Unknown Organization' },
     { label: "Campaign Type", value: campaign.campaignType || 'Not specified' },
-    { label: "Goal", value: `₱${(campaign.goalAmount || 0).toLocaleString()}` },
+    { label: "Goal", value: `₱${(campaign.targetAmount || 0).toLocaleString()}` },
     { label: "Location", value: organization?.address || campaign.location || 'Not specified' },
     { label: "Status", value: campaign.status || 'Active' },
     { label: "Date Posted", value: campaign.createdAt ? new Date(campaign.createdAt).toLocaleDateString() : 'Not specified' }
@@ -156,7 +159,7 @@ const Donation = () => {
               </div>
               <div className="flex justify-between mt-2 text-sm text-gray-600">
                 <span>₱{(campaign.totalRaised || 0).toLocaleString()} raised</span>
-                <span>Goal: ₱{(campaign.goalAmount || 0).toLocaleString()}</span>
+                <span>Goal: ₱{(campaign.targetAmount || 0).toLocaleString()}</span>
               </div>
             </div>
 
@@ -273,9 +276,10 @@ const Donation = () => {
       {/* DONATE MODAL */}
       {isModalOpen && (
         <DonateModal
-          onClose={handleDonationSuccess}
+          onClose={handleCloseModal}
           campaignTitle={campaign.title || campaign.campaignTitle}
           campaignId={campaign.campaignID || campaign.id}
+          onDonationSuccess={handleDonationSuccess}
         />
       )}
     </>
