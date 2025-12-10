@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import TopNavbar from "../components/TopNavbar.jsx";
 import { getCampaignById, updateCampaign, deleteCampaign } from '../services/campaignService';
+import { getDonationsByCampaign } from '../services/donationService';
 
 const CampaignPage = () => {
   const { id } = useParams();
@@ -12,6 +13,8 @@ const CampaignPage = () => {
   const [campaign, setCampaign] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [donations, setDonations] = useState([]);
+  const [showFullDescription, setShowFullDescription] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -57,8 +60,19 @@ const CampaignPage = () => {
       }
     };
 
+    const fetchDonations = async () => {
+      try {
+        const donationsData = await getDonationsByCampaign(id);
+        setDonations(donationsData || []);
+      } catch (err) {
+        console.error('Error fetching donations:', err);
+        setDonations([]);
+      }
+    };
+
     if (id && user) {
       fetchCampaign();
+      fetchDonations();
     }
   }, [id, user]);
 
@@ -129,7 +143,7 @@ const CampaignPage = () => {
             <p className="text-[#624d41] text-xl font-semibold mb-2">Error Loading Campaign</p>
             <p className="text-[#b6b1b2] mb-4">{error}</p>
             <button
-              onClick={() => navigate('/organization')}
+              onClick={() => navigate('/organization?section=campaigns')}
               className="bg-[#a50805] text-white px-6 py-2 rounded-lg hover:bg-[#d32f2f] transition-colors"
             >
               Back to Organization
@@ -145,12 +159,20 @@ const CampaignPage = () => {
     return null;
   }
 
-  // Mock data for display (until backend provides these)
+  // Calculate real donation data
+  const totalRaised = donations.reduce((sum, donation) => sum + (donation.amount || 0), 0);
+  const totalDonations = donations.length;
+  const averageDonation = totalDonations > 0 ? totalRaised / totalDonations : 0;
+  const donationAmounts = donations.map(d => d.amount || 0);
+  const largestDonation = donationAmounts.length > 0 ? Math.max(...donationAmounts) : 0;
+  const smallestDonation = donationAmounts.length > 0 ? Math.min(...donationAmounts) : 0;
+
+  // Data for display
   const displayData = {
     title: campaign.name || 'Untitled Campaign',
     description: campaign.description || 'No description provided',
     goal: campaign.targetAmount || 0,
-    raised: 0, // Would come from donations sum
+    raised: totalRaised,
     type: 'Relief',
     location: 'Location TBD',
     period: '3 months',
@@ -162,24 +184,24 @@ const CampaignPage = () => {
     currentBeneficiaries: 0
   };
 
-  // Mock donor data
-  const donors = [
-    { id: 1, name: 'John Doe', amount: 1000, date: '2024-11-20', message: 'Stay strong community!' },
-    { id: 2, name: 'Jane Smith', amount: 2500, date: '2024-11-18', message: 'Hope this helps rebuild your homes.' },
-    { id: 3, name: 'Bob Johnson', amount: 500, date: '2024-11-15', message: 'Supporting our local heroes.' },
-    { id: 4, name: 'Maria Santos', amount: 2000, date: '2024-11-12', message: 'Proud to help my community.' },
-    { id: 5, name: 'Carlos Mendoza', amount: 1500, date: '2024-11-10', message: 'Together we can rebuild.' }
-  ];
+  // Transform donations to donor format
+  const donors = donations.map(donation => ({
+    id: donation.donationID,
+    name: donation.user ? `${donation.user.firstName || ''} ${donation.user.lastName || ''}`.trim() : 'Anonymous',
+    amount: donation.amount || 0,
+    date: donation.date ? new Date(donation.date).toISOString().split('T')[0] : 'N/A',
+    message: donation.notes || 'Thank you for your support!'
+  }));
 
-  // Mock analytics data
+  // Calculate analytics data from real donations
   const analytics = {
-    totalDonations: 45,
-    averageDonation: 777.78,
-    largestDonation: 2500,
-    smallestDonation: 100,
-    dailyAverage: 350,
-    weeklyGrowth: 15.2,
-    monthlyGrowth: 42.8
+    totalDonations: totalDonations,
+    averageDonation: averageDonation,
+    largestDonation: largestDonation,
+    smallestDonation: smallestDonation,
+    dailyAverage: totalDonations > 0 ? totalRaised / Math.max(1, Math.ceil((new Date() - new Date(campaign.startDate)) / (1000 * 60 * 60 * 24))) : 0,
+    weeklyGrowth: 0, // Would need historical data
+    monthlyGrowth: 0 // Would need historical data
   };
 
   const getStatusColor = (status) => {
@@ -248,7 +270,21 @@ const CampaignPage = () => {
                   {displayData.status}
                 </span>
               </div>
-              <p className="text-white/90 text-lg mb-4">{displayData.description}</p>
+              <div className="mb-4">
+                <p className="text-white/90 text-lg">
+                  {showFullDescription || displayData.description.length <= 150
+                    ? displayData.description
+                    : `${displayData.description.substring(0, 150)}...`}
+                </p>
+                {displayData.description.length > 150 && (
+                  <button
+                    onClick={() => setShowFullDescription(!showFullDescription)}
+                    className="mt-2 text-white/80 hover:text-white underline text-sm font-medium transition-colors duration-200"
+                  >
+                    {showFullDescription ? 'See less' : 'See more'}
+                  </button>
+                )}
+              </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                 <div className="bg-white/10 rounded-lg p-3">
                   <div className="text-white/70">Goal</div>
@@ -946,7 +982,7 @@ const CampaignPage = () => {
       {/* Action Buttons */}
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 border-t border-[#e9ecef]">
         <button
-          onClick={() => navigate('/organization')}
+          onClick={() => navigate('/organization?section=campaigns')}
           className="px-6 py-3 text-[#624d41] border-2 border-[#e9ecef] rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 font-medium flex items-center gap-2 w-full sm:w-auto justify-center"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1032,8 +1068,8 @@ const CampaignPage = () => {
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={`flex items-center space-x-2 px-5 py-3 rounded-lg font-medium transition-all duration-200 ${activeTab === tab.id
-                        ? 'bg-[#a50805] text-white shadow-md'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                      ? 'bg-[#a50805] text-white shadow-md'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
                       }`}
                   >
                     {tab.icon}

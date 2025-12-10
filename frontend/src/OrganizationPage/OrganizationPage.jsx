@@ -48,6 +48,16 @@ const OrganizationPage = () => {
     totalRaised: campaigns.reduce((sum, c) => sum + (c.raised || 0), 0)
   };
 
+  // Sync active section from query param (?section=campaigns, analytics, settings, dashboard)
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const section = params.get('section');
+    const allowed = ['dashboard', 'campaigns', 'analytics', 'settings'];
+    if (section && allowed.includes(section)) {
+      setActiveSection(section);
+    }
+  }, [location.search]);
+
   // Fetch campaigns on component mount and when returning to the page
   useEffect(() => {
     const fetchCampaigns = async () => {
@@ -451,7 +461,7 @@ const OrganizationPage = () => {
               {activeSection === 'dashboard' && <Dashboard organization={organization} campaigns={campaigns} onCreateCampaign={() => setIsModalOpen(true)} onViewAnalytics={() => setActiveSection('analytics')} />}
               {activeSection === 'campaigns' && <Campaigns campaigns={campaigns} setCampaigns={setCampaigns} searchTerm={searchTerm} setSearchTerm={setSearchTerm} statusFilter={statusFilter} setStatusFilter={setStatusFilter} sortBy={sortBy} setSortBy={setSortBy} onCreateCampaign={() => setIsModalOpen(true)} onEditCampaign={handleEditCampaign} onDeleteCampaign={handleDeleteCampaign} navigate={navigate} />}
               {activeSection === 'analytics' && <Analytics organization={organization} />}
-              {activeSection === 'settings' && <Settings organization={organization} />}
+              {activeSection === 'settings' && <Settings />}
             </>
           )}
         </div>

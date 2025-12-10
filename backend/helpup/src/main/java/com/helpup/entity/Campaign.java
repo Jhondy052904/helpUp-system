@@ -14,7 +14,10 @@ public class Campaign {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long campaignID;
     private String name;
+
+    @Column(length = 2000)
     private String description;
+
     private LocalDate startDate;
     private LocalDate endDate;
     private Double targetAmount;
