@@ -143,7 +143,7 @@ const CampaignPage = () => {
             <p className="text-[#624d41] text-xl font-semibold mb-2">Error Loading Campaign</p>
             <p className="text-[#b6b1b2] mb-4">{error}</p>
             <button
-              onClick={() => navigate('/organization?section=campaigns')}
+              onClick={() => navigate('/organization')}
               className="bg-[#a50805] text-white px-6 py-2 rounded-lg hover:bg-[#d32f2f] transition-colors"
             >
               Back to Organization
@@ -982,7 +982,7 @@ const CampaignPage = () => {
       {/* Action Buttons */}
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 border-t border-[#e9ecef]">
         <button
-          onClick={() => navigate('/organization?section=campaigns')}
+          onClick={() => navigate('/organization')}
           className="px-6 py-3 text-[#624d41] border-2 border-[#e9ecef] rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-300 font-medium flex items-center gap-2 w-full sm:w-auto justify-center"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
