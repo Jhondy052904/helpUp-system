@@ -2,6 +2,7 @@ package com.helpup.entity;
 
 import jakarta.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -20,7 +21,7 @@ public class Campaign {
 
     @ManyToOne
     @JoinColumn(name = "organizationID")
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Organization organization;
 
     // One campaign can have many donations

@@ -27,6 +27,15 @@ const CampaignPage = () => {
       try {
         setLoading(true);
         const data = await getCampaignById(id);
+
+        // Check if the campaign belongs to the current user's organization
+        const userOrgId = user?.organization?.organizationID || user?.organizationID;
+        if (userOrgId && data.organizationID !== userOrgId) {
+          setError('You do not have permission to view this campaign.');
+          setLoading(false);
+          return;
+        }
+
         setCampaign(data);
         setFormData({
           name: data.name || '',
@@ -48,10 +57,10 @@ const CampaignPage = () => {
       }
     };
 
-    if (id) {
+    if (id && user) {
       fetchCampaign();
     }
-  }, [id]);
+  }, [id, user]);
 
   // Handle form input changes
   const handleInputChange = (e) => {
@@ -186,8 +195,8 @@ const CampaignPage = () => {
   const progressPercentage = Math.min((displayData.raised / displayData.goal) * 100, 100);
 
   const tabs = [
-    { 
-      id: 'overview', 
+    {
+      id: 'overview',
       name: 'Overview',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -195,8 +204,8 @@ const CampaignPage = () => {
         </svg>
       )
     },
-    { 
-      id: 'donors', 
+    {
+      id: 'donors',
       name: 'Donors',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -204,8 +213,8 @@ const CampaignPage = () => {
         </svg>
       )
     },
-    { 
-      id: 'analytics', 
+    {
+      id: 'analytics',
       name: 'Analytics',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -213,8 +222,8 @@ const CampaignPage = () => {
         </svg>
       )
     },
-    { 
-      id: 'settings', 
+    {
+      id: 'settings',
       name: 'Settings',
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -840,7 +849,7 @@ const CampaignPage = () => {
                 </div>
                 <input type="radio" name="status" value="Active" defaultChecked className="w-4 h-4 text-[#a50805] focus:ring-[#a50805]" />
               </div>
-              
+
               <div className="flex items-center justify-between p-4 rounded-lg border border-[#e9ecef] hover:border-[#ff9800] hover:bg-[#ff9800] hover:bg-opacity-5 transition-all duration-200 cursor-pointer">
                 <div className="flex items-center gap-3">
                   <div className="bg-[#ff9800] p-2 rounded-lg">
@@ -855,7 +864,7 @@ const CampaignPage = () => {
                 </div>
                 <input type="radio" name="status" value="Paused" className="w-4 h-4 text-[#a50805] focus:ring-[#a50805]" />
               </div>
-              
+
               <div className="flex items-center justify-between p-4 rounded-lg border border-[#e9ecef] hover:border-[#f44336] hover:bg-[#f44336] hover:bg-opacity-5 transition-all duration-200 cursor-pointer">
                 <div className="flex items-center gap-3">
                   <div className="bg-[#f44336] p-2 rounded-lg">
@@ -1014,19 +1023,18 @@ const CampaignPage = () => {
                 </svg>
                 <span className="font-medium">Back</span>
               </button>
-              
+
               <div className="flex-1"></div>
-              
+
               <div className="flex space-x-2">
                 {tabs.map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center space-x-2 px-5 py-3 rounded-lg font-medium transition-all duration-200 ${
-                      activeTab === tab.id
+                    className={`flex items-center space-x-2 px-5 py-3 rounded-lg font-medium transition-all duration-200 ${activeTab === tab.id
                         ? 'bg-[#a50805] text-white shadow-md'
                         : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                    }`}
+                      }`}
                   >
                     {tab.icon}
                     <span>{tab.name}</span>
