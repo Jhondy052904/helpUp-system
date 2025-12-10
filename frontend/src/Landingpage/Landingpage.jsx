@@ -21,10 +21,11 @@ function Landingpage({ onLogin }) {
 
   const handleOpenAuthModal = (type) => {
     setAuthType(type);
-    // Open Register directly instead of the auth modal
     if (type === 'register') {
-      setShowRegister(true);
+      // Show modal for register to choose between donor/organization
+      setShowAuthModal(true);
     } else {
+      // Open login directly
       setShowLogin(true);
     }
   };
