@@ -9,6 +9,7 @@ import DonationGrid from "../components/DonationGrid.jsx";
 import DonateModal from "../DonationPage/DonateModal.jsx";
 import { fetchOrganizationById } from '../services/organizationService.js';
 import { getCampaignsByOrganization } from '../services/campaignService.js';
+import { getDonationsByCampaign } from '../services/donationService.js';
 
 const OrganizationPageDonor = () => {
     const navigate = useNavigate();
@@ -36,6 +37,18 @@ const OrganizationPageDonor = () => {
             // Fetch campaigns for this organization
             const campaignsData = await getCampaignsByOrganization(orgId);
 
+            // Fetch donations for each campaign to calculate real total raised
+            const totalRaisedAmount = await Promise.all(campaignsData.map(async (campaign) => {
+                try {
+                    const donations = await getDonationsByCampaign(campaign.campaignID);
+                    const donationList = Array.isArray(donations) ? donations : donations.data || [];
+                    return donationList.reduce((sum, donation) => sum + (donation.amount || 0), 0);
+                } catch (err) {
+                    console.error(`Error fetching donations for campaign ${campaign.campaignID}:`, err);
+                    return 0;
+                }
+            })).then(amounts => amounts.reduce((sum, amount) => sum + amount, 0));
+
             setOrganization({
                 id: orgData.organizationID,
                 name: orgData.name,
@@ -43,7 +56,7 @@ const OrganizationPageDonor = () => {
                 location: orgData.address || 'Location not specified',
                 contactDetails: orgData.contactDetails,
                 activeCampaigns: campaignsData.length,
-                totalRaised: orgData.totalRaised || 0,
+                totalRaised: totalRaisedAmount > 0 ? totalRaisedAmount : orgData.totalRaised || 0,
                 memberCount: orgData.memberCount || 0,
             });
 

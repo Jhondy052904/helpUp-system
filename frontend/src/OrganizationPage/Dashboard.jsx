@@ -2,10 +2,27 @@ import React from 'react';
 
 const Dashboard = ({ organization, campaigns, onCreateCampaign, onViewAnalytics }) => {
   // Calculate additional metrics
-  const activeCampaigns = campaigns.filter(c => c.status === 'Active').length;
-  const completedCampaigns = campaigns.filter(c => c.status === 'Completed').length;
-  const totalDonors = campaigns.reduce((acc, campaign) => acc + Math.floor(campaign.raised / 100), 0); // Rough estimate
-  const avgDonation = organization.totalRaised / Math.max(totalDonors, 1);
+  // Normalize campaign status values for comparison
+  const activeCampaigns = campaigns.filter(c => 
+    c.status && (c.status.toLowerCase() === 'active' || c.status === 'ACTIVE')
+  ).length;
+  
+  const completedCampaigns = campaigns.filter(c => 
+    c.status && (c.status.toLowerCase() === 'completed' || c.status === 'COMPLETED')
+  ).length;
+  
+  // Calculate total funds raised from campaigns (which have real donation data)
+  const totalFundsRaised = campaigns.reduce((sum, campaign) => sum + (campaign.raised || 0), 0);
+  
+  // Calculate average donation (prevent division by zero)
+  const totalDonorsEstimate = campaigns.reduce((acc, campaign) => {
+    const raised = campaign.raised || 0;
+    return acc + (raised > 0 ? Math.max(Math.floor(raised / 100), 1) : 0);
+  }, 0) || 1;
+  
+  const avgDonation = totalFundsRaised / totalDonorsEstimate;
+  
+  // Calculate success rate based on completed campaigns vs total campaigns
   const successRate = campaigns.length > 0 ? Math.round((completedCampaigns / campaigns.length) * 100) : 0;
 
   return (
@@ -40,7 +57,7 @@ const Dashboard = ({ organization, campaigns, onCreateCampaign, onViewAnalytics 
                   <div className="text-sm text-white/80">Total Campaigns</div>
                 </div>
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-                  <div className="text-2xl font-bold">₱{organization.totalRaised.toLocaleString()}</div>
+                  <div className="text-2xl font-bold">₱{totalFundsRaised.toLocaleString()}</div>
                   <div className="text-sm text-white/80">Funds Raised</div>
                 </div>
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
@@ -137,7 +154,7 @@ const Dashboard = ({ organization, campaigns, onCreateCampaign, onViewAnalytics 
               </div>
             </div>
             <h3 className="text-gray-800 font-semibold text-lg mb-2">Funds Raised</h3>
-            <p className="text-3xl font-bold text-green-600 mb-2 group-hover:scale-110 transition-transform duration-300 origin-left">₱{organization.totalRaised.toLocaleString()}</p>
+            <p className="text-3xl font-bold text-green-600 mb-2 group-hover:scale-110 transition-transform duration-300 origin-left">₱{totalFundsRaised.toLocaleString()}</p>
             <div className="flex items-center text-gray-600 text-sm">
               <span className="inline-block w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
               <span>+{Math.floor(Math.random() * 20) + 5}% growth</span>
