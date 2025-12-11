@@ -1,6 +1,58 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { getDonationsByCampaign } from '../services/donationService.js';
 
 const Dashboard = ({ organization, campaigns, onCreateCampaign, onViewAnalytics }) => {
+  const [recentActivities, setRecentActivities] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  // Fetch donations for all campaigns and extract recent donor activities
+  useEffect(() => {
+    const fetchRecentDonations = async () => {
+      try {
+        setLoading(true);
+        const allDonations = [];
+
+        // Fetch donations for each campaign
+        for (const campaign of campaigns) {
+          try {
+            const donations = await getDonationsByCampaign(campaign.id);
+            const donationList = Array.isArray(donations) ? donations : donations.data || [];
+            
+            // Map donations to activity format with campaign info
+            donationList.forEach(donation => {
+              allDonations.push({
+                type: 'donation',
+                donorName: donation.user ? `${donation.user.firstName || ''} ${donation.user.lastName || ''}`.trim() : 'Anonymous',
+                amount: donation.amount,
+                campaignName: campaign.title,
+                campaignId: campaign.id,
+                date: donation.date,
+                status: donation.status
+              });
+            });
+          } catch (err) {
+            console.error(`Error fetching donations for campaign ${campaign.id}:`, err);
+          }
+        }
+
+        // Sort by date (most recent first) and take top 8
+        const sorted = allDonations
+          .sort((a, b) => new Date(b.date) - new Date(a.date))
+          .slice(0, 8);
+
+        setRecentActivities(sorted);
+      } catch (error) {
+        console.error('Error fetching recent activities:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (campaigns && campaigns.length > 0) {
+      fetchRecentDonations();
+    }
+  }, [campaigns]);
+
   // Calculate additional metrics
   // Normalize campaign status values for comparison
   const activeCampaigns = campaigns.filter(c => 
@@ -241,69 +293,50 @@ const Dashboard = ({ organization, campaigns, onCreateCampaign, onViewAnalytics 
         {/* Recent Activity with Enhanced Design */}
         <div className="bg-gradient-to-br from-white to-gray-50 p-6 rounded-xl border border-gray-200 shadow-md">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-bold text-gray-800">Recent Activity</h3>
+            <h3 className="text-xl font-bold text-gray-800">Recent Donor Activity</h3>
             <div className="flex items-center text-green-600 text-sm">
               <span className="inline-block w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
               <span>Live</span>
             </div>
           </div>
           <div className="space-y-4">
-            <div className="flex items-start space-x-4 p-4 rounded-lg hover:bg-blue-50 transition-all duration-300 cursor-pointer group border border-transparent hover:border-blue-200">
-              <div className="bg-blue-500 p-2 rounded-full group-hover:bg-blue-600 transition-colors duration-300 shadow-md flex-shrink-0">
-                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-                </svg>
+            {loading ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                <span className="ml-3 text-gray-600">Loading activities...</span>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-gray-800 font-medium group-hover:text-blue-700 transition-colors duration-300">New donation received for Fire Recovery Support</p>
-                <div className="flex items-center text-gray-500 text-sm mt-1">
-                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                  </svg>
-                  <span>2 hours ago</span>
-                  <span className="mx-2">•</span>
-                  <span className="text-green-600 font-medium">₱500</span>
+            ) : recentActivities.length > 0 ? (
+              recentActivities.map((activity, index) => (
+                <div key={index} className="flex items-start space-x-4 p-4 rounded-lg hover:bg-blue-50 transition-all duration-300 cursor-pointer group border border-transparent hover:border-blue-200">
+                  <div className="bg-blue-500 p-2 rounded-full group-hover:bg-blue-600 transition-colors duration-300 shadow-md flex-shrink-0">
+                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                    </svg>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-gray-800 font-medium group-hover:text-blue-700 transition-colors duration-300">
+                      {activity.donorName} donated to <span className="font-semibold">{activity.campaignName}</span>
+                    </p>
+                    <div className="flex items-center text-gray-500 text-sm mt-1">
+                      <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
+                      <span>{new Date(activity.date).toLocaleDateString()}</span>
+                      <span className="mx-2">•</span>
+                      <span className="text-green-600 font-medium">₱{activity.amount.toLocaleString()}</span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-
-            <div className="flex items-start space-x-4 p-4 rounded-lg hover:bg-green-50 transition-all duration-300 cursor-pointer group border border-transparent hover:border-green-200">
-              <div className="bg-green-500 p-2 rounded-full group-hover:bg-green-600 transition-colors duration-300 shadow-md flex-shrink-0">
-                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              ))
+            ) : (
+              <div className="flex flex-col items-center justify-center py-8 text-gray-500">
+                <svg className="w-12 h-12 mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                 </svg>
+                <p>No donation activity yet</p>
+                <p className="text-sm">Donations will appear here as they're received</p>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-gray-800 font-medium group-hover:text-green-700 transition-colors duration-300">Campaign goal reached: Community Education Program</p>
-                <div className="flex items-center text-gray-500 text-sm mt-1">
-                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                  </svg>
-                  <span>1 day ago</span>
-                  <span className="mx-2">•</span>
-                  <span className="text-green-600 font-medium">Goal: ₱25,000</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-start space-x-4 p-4 rounded-lg hover:bg-purple-50 transition-all duration-300 cursor-pointer group border border-transparent hover:border-purple-200">
-              <div className="bg-purple-500 p-2 rounded-full group-hover:bg-purple-600 transition-colors duration-300 shadow-md flex-shrink-0">
-                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                </svg>
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-gray-800 font-medium group-hover:text-purple-700 transition-colors duration-300">New volunteer joined your organization</p>
-                <div className="flex items-center text-gray-500 text-sm mt-1">
-                  <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                  </svg>
-                  <span>3 days ago</span>
-                  <span className="mx-2">•</span>
-                  <span className="text-purple-600 font-medium">+1 member</span>
-                </div>
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
